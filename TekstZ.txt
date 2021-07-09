@@ -1,0 +1,1294 @@
+1.
+Pretrage po cetiri cene odredjene ukupne vrednosti 7.11.
+Postoje dva nacina pretrage prvo jedan pa onda ostalo a i b.
+---------------------------
+---------------------------
+
+#include <iostream>
+#include <stdio.h>
+
+using namespace std;
+
+
+
+int main() {
+
+	for (int x1 = 1; x1 < 709; x1++) {
+		for (int x2 = x1; x2 < 709; x2++) {
+			for (int x3 = x2; x3 < 709; x3++) {
+				for (int x4 = x3; x4 < 709; x4++) {
+
+					long long int proizvod = x1 * x2 * x3 * x4;
+					long long int zbir = x1 + x2 + x3 + x4;
+
+
+					if (proizvod == 711e6 && zbir == 711) {
+						cout << "{";
+						cout << float(x1) / float(100);
+						cout << " , ";
+						cout << float(x2) / float(100);
+						cout << " , ";
+						cout << float(x3) / float(100);
+						cout << " , ";
+						cout << float(x4) / float(100);
+						cout << "}";
+						cout << endl;
+					}
+
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+------------------------------------------------------
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+
+int main() {
+
+
+	for (int x1 = 1; x1 < 709; x1++) {
+		for (int x2 = x1; x2 < 709; x2++) {
+			for (int x3 = x2; x3 < 709; x3++) {
+
+				int x4 = 711 - x1 - x2 - x3;
+
+				long long int proizvod = x1 * x2 * x3 * x4;
+
+				if (proizvod == 711e6) {
+					if (x1 <= x2 && x2 <= x3 && x3<= x4) {
+						cout << "{";
+						cout << float(x1) / float(100);
+						cout << " , ";
+						cout << float(x2) / float(100);
+						cout << " , ";
+						cout << float(x3) / float(100);
+						cout << " , ";
+						cout << float(x4) / float(100);
+						cout << "}";
+						cout << endl;
+					}
+				}
+
+
+			}
+		}
+	}
+
+	return 0;
+}
+============================================================================================================
+2.
+Redosled obilaska svih rupa , prvi slucaj 8 ,drugi 12 rupa.
+Obilazak po TSP problemu.
+Rastojanje izmedju rupa po svim mogucim obilascima.
+Pri cemu poredimo sa svim prethodnima i dalje pamtimo ispis.
+---------------------------
+---------------------------
+#include <stdio.h>
+#include <iostream>
+#include <algorithm>
+#include <cstdlib>
+#include <cmath>
+
+using namespace std;
+
+
+void inicijalizacija(int broj, double** rastojanja, double* x, double* y) {
+
+	for (int i = 0; i < broj; i++) {
+		for (int j = 0; j < broj; j++) {
+			rastojanja[i][j] = 0;
+		}
+	}
+
+
+
+	for (int i = 0; i < broj; i++) {
+		for (int j = i+1; j < broj; j++) {
+
+			if (i != j && rastojanja[i][j]==0) {
+				double rx = (x[i] - x[j])*(x[i] - x[j]);
+				double ry = (y[i] - y[j])*(y[i] - y[j]);
+				rastojanja[i][j] = sqrt(rx + ry);
+				rastojanja[j][i] = sqrt(rx + ry);}
+
+		}
+	}
+}
+
+
+double rastojanje(int broj, double** rastojanja,int *niz) {
+	double ras = 0;
+
+	for (int i = 0; i < broj-1; i++) {
+		ras+= rastojanja[niz[i]][niz[i+1]];}
+
+	return ras;
+}
+
+bool next_permutation(int N, int *P) {
+
+	int s;
+	int *first = &P[0];
+	int *last = &P[N - 1];
+	int *k = last - 1;
+	int *l = last;
+
+	while (k > first) {
+
+		if (*k < *(k + 1)) break;
+		
+		k--;}
+
+	if (*k > *(k + 1)) return 0;
+
+	while (l > k) {
+
+		if (*l > *k)break;
+		
+		l--;}
+
+	s = *k;
+	*k = *l;
+	*l = s;
+
+	first = k + 1;
+
+	while (first < last) {
+		s = *first;
+		*first = *last;
+		*last = s;
+
+		first++;
+		last--;}
+
+	return l;
+}
+
+
+int main() {
+
+	double x[12] = {62.0,57.5,51.7,67.9,57.7,54.2,46.0,34.7,45.7,34.7,28.4,33.4};
+	double y[12] = {58.4,56.0,56.0,19.6,42.1,29.1,45.1,45.1,25.1,26.4,31.7,60.5};
+
+
+	int broj= 0;
+	double min = 0; 
+	
+
+	int niz[12] = { 0,1,2,3,4,5,6,7,8,9,10,11};
+	int minniz[12] = { 0,1,2,3,4,5,6,7,8,9,10,11 };
+
+	while (broj != 8 && broj != 12) {
+		cout << "Unesite broj rupa 8 ili 12"<<endl;
+		cin >> broj;
+	};
+
+	double** rastojanja = new double*[broj];
+	for (int i = 0; i < broj; ++i)
+		rastojanja[i] = new double[broj];
+
+	inicijalizacija(broj, rastojanja, x, y);
+
+	min=rastojanje(broj,rastojanja,niz);
+
+	while (next_permutation(broj, niz)) {
+		double ras= rastojanje(broj, rastojanja, niz);
+		if (ras < min) {
+			min = ras;
+			for (int i = 0; i < broj; i++)minniz[i] = niz[i];
+		}
+	}
+
+
+	cout << endl<< "Duzina najkraceg puta:  ";
+	cout << min<<endl<<endl;
+
+	cout << "Putanja:  ";
+	for (int i = 0; i < broj; i++)printf("%4d", minniz[i]+1);
+	cout << endl;
+
+	delete []rastojanja;
+
+	return 0;
+}
+
+============================================================================================================
+3.
+Deset gradova za povezivanje radi mreze.
+Resenje po kompletnom grafu K10.
+Bez postojanja petlji.
+Potrebno je povezati potpunom pretragom bez petlji.
+---------------------------
+---------------------------
+#include <stdio.h>
+#include <iostream>
+
+using namespace std;
+int next_premutation(const int N, int *P) {
+	int s;
+	int * first = &P[0];
+	int * last = &P[N - 1];
+	int * k = last - 1;
+	int * l = last;
+	while (k > first) {
+		if (*k < *(k + 1)) {
+			break;
+		}
+		k--;
+	}
+	if (*k > *(k + 1)) {
+		return 0;
+	}
+	while (l > k) {
+		if (*l > *k) {
+			break;
+		}
+		l--;
+	}
+	s = *k;
+	*k = *l;
+	*l = s;
+
+	first = k + 1;
+	while (first < last) {
+		s = *first;
+		*first = *last;
+		*last = s;
+
+		first++;
+		last--;
+	}
+	return 1;
+}
+//gotov deo za permutacije
+//deo za spaning tree
+void SequenceToSpaningTree(int*P, int len, int *T) {
+	int i, j, q = 0;
+	int n = len + 2;
+	int * V = new int[n];
+
+	for (i = 0; i < n; i++)
+		V[i] = 0;
+	for (i = 0; i < len; i++)
+		V[P[i]] +=1 ;
+	for (i = 0; i < len; i++) {
+		for (j = 0; j < n; j++) {
+
+			if (V[j] == 0) {
+				V[j] = -1;
+				T[q++] = j;
+				T[q++] = P[i];
+				V[P[i]] --;
+				break;
+			}
+		}
+	}
+	j = 0;
+	for (i = 0; i < n; i++) {
+		if (V[i] == 0 && j == 0) {
+			T[q++] = i ;
+			j++;
+		}
+		else if (V[i] == 0 && j == 1) {
+			T[q++] = i ;
+			break;
+		}
+	}
+	delete[] V;
+}
+void main() {
+	//matrica sa gradovima
+	int Gradovi[10][10] = {
+		{ 0  ,  374 , 200,  223 , 108 , 178 , 252  ,285,  240 , 356} ,
+		{ 374 , 0  ,  255,  166 , 433,  199 , 135,  95,  136,  17 } ,
+		{200 , 255 , 0,    128, 277 , 821  ,180 , 160 , 131 , 247 } ,
+		{223 , 166  ,128 , 0  ,  430, 47  , 52 ,  84 ,  40  , 155 } ,
+		{108 , 433 , 277,  430 , 0 ,   453  ,478 , 344, 389 , 423 } ,
+		{178 , 199 , 821,  47 ,  453,  0 ,   91 ,  110 , 64  , 181 } ,
+		{ 252 , 135 , 180 , 52 ,  478,  91  , 0  ,  114 , 83  , 117} ,
+		{285 , 95 ,  160 , 84 ,  344 , 110 , 114,  0  ,  47 ,  78} ,
+		{ 240 , 136,  131,  40 ,  389 , 64  , 83 ,  47 ,  0 ,   118} ,
+		{ 356 , 17  , 247,  155,  423,  181 , 117  ,78  , 118, 0} ,
+	};
+	int zbir = 0; int cilj = 2000;//apsolutno veliki brojk kako bi bilo inizijalizovanu za dalju razmenu u ifu
+	int N = 10;
+	int* P = new int[N];
+	int *z = new int[N];
+	for (int i = 0; i < N; i++)
+		P[i] = i ;//+1
+	do {
+		cout << "Permutacije : ";
+		for (int i = 0; i < N; i++)
+			cout << P[i]<<",";
+		//stablo*
+		cout << " Stablo : ";
+		int len = 8;// sizeof(P) / sizeof(P[0]);
+		int *T = new int[2 * (len + 1)];
+		SequenceToSpaningTree(P, len, T);
+
+		int *Pom = new int[2 * (len + 1)];
+		//niz za pracenje
+		int *Dup = new int[N];
+		for (int i = 0; i < N; i++)
+			Dup[i] = 0;//da ga napravi novi sa pocetnim rastojanjima
+		//------
+		for (int i = 0; i < 2 * (len + 1); i++) {//
+			cout << T[i] << ",";
+			Pom[i] = T[i];
+
+			Dup[T[i]]++;//povecanje za duplikate
+
+			if ((i + 1) % 2 == 0 && i < 2 * len)
+				cout << " | ";
+		}
+		cout << endl;
+		//dodatak za niz
+		cout << " Niz pocetnih cena gradova : ";
+		for (int i =0; i < 2 * (len + 1)-1; i+=2) {//
+			cout << Gradovi[Pom[i]][Pom[i+1]] << ";";
+			if (Dup[i]>=4) {
+				zbir += (Dup[i]*100)-3;
+			}
+			else {
+				zbir += Gradovi[Pom[i]][Pom[i + 1]];
+			}
+			if (zbir < cilj) {
+				cilj = zbir;
+				//zamena za niz putanja
+				for (int i = 0; i < N; i++) {
+					z[i] = T[i];//pomocni niz
+				}
+			}
+		}
+		//kraj dodatka za niz
+		//Stablo kraj***********************************************************
+		cout << endl;
+	} while (next_premutation(N, P));
+	//ispis pravog niza da je nesto jednako
+	cout << endl;
+	cout << "Najbolja dobijena distanca (putanja)";
+	for (int i = 0; i < N; i++) {
+		cout << z[i]<<",";
+	}
+	cout << "Vrednost te putanje je : ";
+	cout << cilj;
+	system("pause");
+}
+
+
+
+============================================================================================================
+4.
+Prikaz beselemove funkcije i dalje prikaz grafika i zverno racunanje.
+---------------------------
+---------------------------
+#include <cmath>
+#include <iostream>
+#include <math.h>
+#include <iomanip>
+
+using namespace std;
+
+
+double f(int n,double x) {
+	double pi = 3.141592653589793;
+	double f = sqrt(pi / (2 * x)) * std::sph_bessel(n, x);
+	return f;
+}
+
+
+
+
+int main()
+{	
+	int i = 0;
+	cout << "Za red funckije n = 1" << endl << endl;
+	do {
+		double interval[8] = { 4.0,6.0,6.0,8.0,5.0,7.0,7.0,10.0};
+		double interval1[8] = { 4.0,6.0,6.0,8.0,5.0,7.0,7.0,10.0 };
+		int n[2] = { 1,2 };
+		
+		
+		do {
+
+			double a = interval[i];
+			double b = interval[i + 1];
+
+			double m = 0.5*(a + b);
+
+			if (f(n[i / 4], a)*f(n[i / 4], m) > 0)interval[i] = m;
+			else interval[i + 1] = m;
+
+
+		} while (abs(interval[i] - interval[i + 1]) > 0.000000000001);
+
+		
+
+		cout << fixed;
+		cout << setprecision(12);
+		cout << "x = "<<((interval[i] + interval[i+1]) / 2)<<endl;
+		if(i==2)cout <<endl<<endl<< "Za red funckije n = 2" << endl << endl;
+
+
+	i+=2;
+	} while (i<8);
+
+	return 0;
+
+}
+
+---------------------------
+import numpy as np
+from scipy.special import spherical_jn
+import matplotlib.pyplot as plt
+
+
+x = np.linspace(0, 20, 1000)
+
+for n in range(1, 3):
+    j = spherical_jn(n, x)
+    plt.plot(x, j, label='j' + str(n))
+
+plt.legend()
+plt.title('SFERNE BESELOVE FUNCKIJE')
+plt.xlabel('x')
+plt.ylabel('jn(x)')
+
+plt.grid()
+plt.show()
+
+============================================================================================================
+5.
+Racunanje izlaza zadatog vremena putem neuralne mreze.
+---------------------------
+---------------------------
+---------------------------
+import scipy.special as sp
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.optimize import minimize
+import math
+
+
+def o(x, w_array):
+    yout = 0
+    for i in range(5):
+        wk = w_array[i] * x
+        mk = math.tanh(wk)
+        yout += (w_array[i + 5] * mk)
+    yout = math.tanh(yout)
+    return yout
+
+
+def optimizacija(w_array):
+    f = 0
+    x_array = np.arange(-1.0, 1.1, 0.1)
+    for i in x_array:
+        ytraining = 0.5 * (math.sin(math.pi * i))
+        yout = o(i, w_array)
+        pom = yout - ytraining
+        k = pom ** 2
+        f += k
+    r = math.sqrt(f)
+    return r
+
+
+w_array = np.array([2.50734576, -1.9556475, -2.60164801, -2.52456033, -9.02998646, -0.49999466, 8.25776386, -8.85854527, -5.4591513, 6.12881616])
+rez = minimize(optimizacija, w_array, method='Nelder-Mead', options={'ftol': 10e14})
+
+while rez.fun >= 1e-2:
+    rez = minimize(optimizacija, w_array, method='Nelder-Mead', options={'ftol': 10e14})
+
+print(rez.nit)
+rezultat = np.array(rez.x)
+for i in rezultat:
+    print("% .15f" % i)
+print(rez.fun)
+
+x_arr = np.linspace(-1, 1, 10000)
+nizout = []
+niztrening = []
+
+for i in x_arr:
+    nizout.append(o(i, rezultat))
+    niztrening.append(0.5 * (math.sin(math.pi * i)))
+
+plt.figure()
+plt.plot(x_arr, nizout, label='Y out(x)')
+plt.plot(x_arr, niztrening, label='Y trening(x)')
+plt.legend()
+plt.grid()
+plt.show()
+
+============================================================================================================
+6.
+Postavljanje servera u razne ormare po razlicitoj vrednosti i cetiri razlicita servera upotrebom linearne progresije.
+Gotova funkcija iz pythona i koristi se funkcija za optimizaciju.
+---------------------------
+---------------------------
+import numpy as np
+from scipy.optimize import linprog
+import itertools
+
+A = np.array([[1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+              [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0], [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0], [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+              [480, 650, 580, 390, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 480, 650, 580, 390, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 480, 650, 580, 390]])
+b = np.array([10, 16, 8, 18, 15, 23, 12, 6800, 8700, 4300])
+c = np.array([-310, -380, -350, -285, -310, -380, -350, -285, -310, -380, -350, -285])
+
+x_bound = (0, None)
+
+res = linprog(c, A_ub=A, b_ub=b, bounds=(x_bound, x_bound, x_bound, x_bound, x_bound, x_bound, x_bound, x_bound, x_bound, x_bound, x_bound, x_bound), method='simplex')
+
+print('Total GFlops: ', -res.fun, '\nX:', res.x)
+
+
+matrix = np.array([[3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7], [3, 4, 5, 6, 7, 8, 9], [0, 0, 0, 1, 2, 3, 4]])
+
+
+def maxvr(rex):
+    por = 310 * (rex[0] + rex[4] + rex[8]) + 380 * (rex[1] + rex[5] + rex[9]) + 350 * (rex[2] + rex[6] + rex[10]) + 285 * (rex[3] + rex[7] + rex[11])
+    return por
+
+def provjera(rex2):
+    if (rex2[0] + rex2[1] + rex2[3] + rex2[3]) > 10 or (rex2[4] + rex2[5] + rex2[6] + rex2[7]) > 16 or (rex2[8] + rex2[9] + rex2[10] + rex2[11]) > 8:
+        return 0
+    elif (480*rex2[0] + 650*rex2[1] + 580*rex2[3] + 390*rex2[3]) > 6800 or (480*rex2[4] + 650*rex2[5] + 580*rex2[6] + 390*rex2[7]) > 8700 or (480*rex2[8] + 650*rex2[9] + 580*rex2[10] + 390*rex2[11]) > 4300:
+        return 0
+    elif (rex2[0] + rex2[4] + rex2[8]) > 18 or (rex2[1] + rex2[5] + rex2[9]) > 15 or (rex2[2] + rex2[6] + rex2[10]) > 23 or (rex2[3] + rex2[7] + rex2[11]) > 12:
+        return 0
+    else:
+        return 1
+
+
+n = 7
+k = 4
+P = np.array([0, 0, 0, 0])
+rez = np.array([0, 10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0])
+index = np.array([6, 7, 10, 11])
+max = 0
+q = 1
+
+while q >= 0:
+    pomniz = np.array([0, 10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0])
+    iter = 0
+    for i in P:
+        pomniz[index[iter]] = matrix[iter][P[iter]]
+        iter = (iter+1)
+    cur = maxvr(pomniz)
+    if cur > max:
+        if cur < 11915:
+            if provjera(pomniz):
+                rez = pomniz
+                max = maxvr(pomniz)
+    q = k - 1
+    while q >= 0:
+        P[q] = (P[q] + 1)
+        if P[q] == n:
+            P[q] = 0
+            q = (q - 1)
+        else:
+            break
+
+print("")
+print('Total GFlops: ', max, '\nX:', rez)
+
+
+============================================================================================================
+7.
+Dobijanja kumulativnih minimuma.
+Upotreba pretrazivanja i nlp problem preko beselema
+Zadatak za vezbu ima 64 fjla koji dalje SAT klasama pretrazujemo.
+---------------------------
+---------------------------
+import numpy as np
+import math as math
+import matplotlib.pyplot as plt
+import random
+
+
+def optfunckija(xpom):
+    global s
+    rez = 0
+    for i in range(0, 64):
+        rez = rez + (xpom[i]*s[i])
+    rezultat = math.pow(2, 26) - rez
+    if rezultat < 0:
+        rezultat = math.pow(2, 26)
+    return int(rezultat)
+
+
+def hemming(iter):
+    hmin = 1
+    hmax = 63
+    itot = 100000
+    return int((hmin - hmax) / (itot - 1) * (iter - 1) + hmax)
+
+
+def generatearray(h):
+    global x
+    global x1
+    x1 = x.copy()
+    pom1 = [i for i in range(64)]
+    pom1 = random.sample(pom1, int(h))
+    for i in pom1:
+        x1[i] = 1 - x1[i]
+
+
+def pvalue(e):
+    global T
+    if e == 0:
+        return 0.5
+    else:
+        return math.pow(math.exp(1), -1*(e / T))
+
+s = np.array([173669, 275487, 1197613, 1549805, 502334, 217684, 1796841, 274708,
+631252, 148665, 150254, 4784408, 344759, 440109, 4198037, 329673, 28602,
+144173, 1461469, 187895, 369313, 959307, 1482335, 2772513, 1313997, 254845,
+486167, 2667146, 264004, 297223, 94694, 1757457, 576203, 8577828, 498382,
+8478177, 123575, 4062389, 3001419, 196884, 617991, 421056, 3017627, 131936,
+1152730, 2676649, 656678, 4519834, 201919, 56080, 2142553, 326263, 8172117,
+2304253, 4761871, 205387, 6148422, 414559, 2893305, 2158562, 465972, 304078,
+1841018, 1915571])
+alli = np.zeros(100000, dtype=int)
+a = 0.91
+localmin = 0
+globalmin=-1
+globalx=[]
+localx=[]
+
+for i in range(20):
+    x = np.random.randint(0, 2, 64)
+    x1 = x
+    single = np.zeros(100000, dtype=int)
+
+    cnt = 0
+    T = 32 * 1024 * 1024
+    pom1 = 0
+    pom2 = 0
+
+    localmin = optfunckija(x)
+    localx=x.copy()
+    while cnt < 100000 and optfunckija(x) != 0:
+        pom1 = optfunckija(x)
+        single[cnt] = localmin
+        alli[cnt] = (alli[cnt] + localmin)
+        generatearray(hemming(cnt))
+        pom2 = optfunckija(x1)
+        T = a * T
+        if pom2 < pom1:
+            x = x1
+            if pom2 < localmin:
+                localmin = pom2
+                localx=x1.copy()
+        elif pom2 > pom1:
+            p = pvalue(pom2-pom1)
+            if np.random.random(1)[0] <= p:
+                x = x1
+        cnt = cnt + 1
+        pom2 = 0
+        pom1 = 0
+
+    xrez = np.linspace(0, 100000, 100000)
+    plt.plot(xrez, single, label='run#' + str(i+1))
+    plt.yscale("log")
+    plt.xscale("log")
+
+    if globalmin == -1 or localmin < globalmin:
+        globalmin = localmin
+        globalx = localx
+
+
+
+print(globalx)
+print(globalmin)
+
+plt.legend()
+plt.title("Cumulative minimum")
+plt.xlabel('Iter')
+plt.ylabel('Cumulative minimum(cost-function)')
+plt.grid()
+plt.show()
+
+for i in range(100000):
+    alli[i] = int(alli[i] / 20)
+
+xrez = np.linspace(0, 100000, 100000)
+plt.plot(xrez, alli)
+plt.yscale("log")
+plt.xscale("log")
+plt.title("Average Cumulative minimum")
+plt.xlabel('Iter')
+plt.ylabel('Average Cumulative minimum(cost-function)')
+plt.grid()
+plt.show()
+
+============================================================================================================
+8.
+Implementacija slicnog algoritma upotrebom genetickog algoritma za racunanje
+Slican slucaj kao za zadatak 7.
+Geneticki algoritam na genetici od 2000.
+---------------------------
+---------------------------
+from builtins import dict
+import numpy as np
+import random
+import matplotlib.pyplot as plt
+import math
+
+def optfunckija(xpom):
+    global s
+    rez = 0
+    for i in range(0, 64):
+        rez = rez + (xpom[i]*s[i])
+    rezultat = math.pow(2, 26) - rez
+    if rezultat < 0:
+        rezultat = math.pow(2, 26)
+    return int(rezultat)
+
+
+def generate_next_population():
+    global currentpopulation
+    global nextpopulation
+    global my_dict
+    global key_list
+    global value_list
+    global ukrvr
+    global mutvr
+
+    pom = np.zeros(400, dtype=int)
+    for k in range(400):
+        ind = value_list.index(min(my_dict.values()))
+        pom[k] = key_list[value_list.index(min(my_dict.values()))]
+        del my_dict[key_list[value_list.index(min(my_dict.values()))]]
+        value_list.pop(ind)
+        key_list.pop(ind)
+
+    counter = 0
+
+    while counter < 2000:
+        prvi = pom[random.randint(0, 399)]
+        drugi = pom[random.randint(0, 399)]
+        while prvi == drugi:
+            drugi = pom[random.randint(0, 399)]
+        if random.uniform(0.0, 1.0) < ukrvr:
+            prviniz = currentpopulation[prvi]
+            druginiz = currentpopulation[drugi]
+            granica = random.randint(0, 62)
+
+            c1 = 0
+            c2 = granica+1
+            for k1 in prviniz:
+                if c1 <= granica:
+                    nextpopulation[counter][c1] = k1
+                    c1 = c1 + 1
+                else:
+                    nextpopulation[counter+1][c2] = k1
+                    c2 = c2 + 1
+
+            c1 = granica + 1
+            c2 = 0
+            for k1 in druginiz:
+                if c2 <= granica:
+                    nextpopulation[counter+1][c2] = k1
+                    c2 = c2 + 1
+                else:
+                    nextpopulation[counter][c1] = k1
+                    c1 = c1 + 1
+
+            if random.uniform(0.0, 0.3) < mutvr:
+                kj = random.randint(0, 63)
+                nextpopulation[counter][kj] = 1 - nextpopulation[counter][kj]
+
+            if random.uniform(0.0, 0.3) < mutvr:
+                kj = random.randint(0, 63)
+                nextpopulation[counter + 1][kj] = 1 - nextpopulation[counter + 1][kj]
+
+            counter = counter + 2
+
+    currentpopulation = nextpopulation
+
+
+s = np.array([173669, 275487, 1197613, 1549805, 502334, 217684, 1796841, 274708,
+631252, 148665, 150254, 4784408, 344759, 440109, 4198037, 329673, 28602,
+144173, 1461469, 187895, 369313, 959307, 1482335, 2772513, 1313997, 254845,
+486167, 2667146, 264004, 297223, 94694, 1757457, 576203, 8577828, 498382,
+8478177, 123575, 4062389, 3001419, 196884, 617991, 421056, 3017627, 131936,
+1152730, 2676649, 656678, 4519834, 201919, 56080, 2142553, 326263, 8172117,
+2304253, 4761871, 205387, 6148422, 414559, 2893305, 2158562, 465972, 304078,
+1841018, 1915571])
+
+alli = np.zeros(100000, dtype=int)
+localmin = 0
+localx = []
+globalmin = -1
+globalx = []
+ukrvr = 0.8
+mutvr = 0.1
+
+for pokretanje in range(20):
+
+    currentpopulation = np.random.randint(0, 2, (2000, 64))
+    nextpopulation = np.random.randint(0, 2, (2000, 64))
+    single = np.zeros(100000, dtype=int)
+    my_dict = {}
+    cnt = 0
+
+    localmin = 0
+    localx = []
+
+    for i in range(2000):
+        currentpopulation[i] = np.random.randint(0, 2, 64)
+        my_dict[i] = optfunckija(currentpopulation[i])
+        if i == 0:
+            localmin = my_dict[i]
+            localx = currentpopulation[i].copy()
+        else:
+            if my_dict[i] < localmin:
+                localmin=my_dict[i]
+                localx = currentpopulation[i].copy()
+        single[cnt] = localmin
+        alli[cnt] = (alli[cnt] + localmin)
+        cnt = cnt + 1
+
+    key_list = list(my_dict.keys())
+    value_list = list(my_dict.values())
+
+    for i in range(49):
+        generate_next_population()
+        my_dict = {}
+        for m in range(2000):
+            my_dict[m] = optfunckija(currentpopulation[m])
+            if my_dict[m] < localmin:
+                localmin = my_dict[m]
+                localx = currentpopulation[m].copy()
+            single[cnt] = localmin
+            alli[cnt] = (alli[cnt] + localmin)
+            cnt = cnt + 1
+
+        key_list = list(my_dict.keys())
+        value_list = list(my_dict.values())
+
+
+    xrez = np.linspace(0, 100000, 100000)
+    plt.plot(xrez, single, label='run#' + str(pokretanje+1))
+    plt.yscale("log")
+    plt.xscale("log")
+
+    if globalmin == -1 or localmin < globalmin:
+        globalmin = localmin
+        globalx=localx
+
+
+print(globalx)
+print(globalmin)
+
+plt.legend()
+plt.title("Cumulative minimum")
+plt.xlabel('Iter')
+plt.ylabel('Cumulative minimum(cost-function)')
+plt.grid()
+plt.show()
+
+for i in range(100000):
+    alli[i] = int(alli[i] / 20)
+
+xrez = np.linspace(0, 100000, 100000)
+plt.plot(xrez, alli)
+plt.yscale("log")
+plt.xscale("log")
+plt.title("Average Cumulative minimum")
+plt.xlabel('Iter')
+plt.ylabel('Average Cumulative minimum(cost-function)')
+plt.grid()
+plt.show()
+============================================================================================================
+9.
+Pronalaza signala u gde se nalzai upotrebmo funkcije, koje smo dobili.
+Diferencijalna evolucija.
+Zadatak koristi funkcije sinusa i ostalo kao funkcije za dalje racunanje svih tacaka.
+---------------------------
+---------------------------
+import numpy as np
+import random
+import math
+
+
+def postavikordinate():
+    global R0
+    global xkord
+    global ykord
+    global N
+    for i in range(N):
+        xkord[i] = R0 * math.cos((2 * math.pi * i) / N)
+        ykord[i] = R0 * math.sin((2 * math.pi * i) / N)
+
+
+def opfunkcija(xglobal):
+    global R0
+    global s
+    global xkord
+    global ykord
+    if math.sqrt(math.pow(xglobal[0], 2) + math.pow(xglobal[1], 2)) >= R0 or math.sqrt(
+                math.pow(xglobal[2], 2) + math.pow(xglobal[3], 2)) >= R0:
+        return 100.0
+    else:
+        rezultat = 0.0
+        for i in range(20):
+            midrez = (xglobal[4] / math.sqrt(
+                math.pow(xkord[i] - xglobal[0], 2) + math.pow(ykord[i] - xglobal[1], 2))) + (xglobal[5] / math.sqrt(
+                math.pow(xkord[i] - xglobal[2], 2) + math.pow(ykord[i] - xglobal[3], 2))) - s[i]
+            midrez = math.pow(midrez, 2)
+            rezultat = rezultat + midrez
+        return rezultat
+
+
+def diferencijalna_evolucija():
+    global tekucapopulacija
+    global Npopulacije
+    global D
+    global CR
+    global fopt
+    global xopt
+    global D
+
+    for i in range(Npopulacije):
+        x = tekucapopulacija[i]
+        y = np.zeros(D, dtype=float)
+
+        n1 = random.randint(0, Npopulacije - 1)
+        while n1 == i:
+            n1 = random.randint(0, Npopulacije - 1)
+        xa = tekucapopulacija[n1]
+
+        n2 = random.randint(0, Npopulacije - 1)
+        while n2 == i or n2 == n1:
+            n2 = random.randint(0, Npopulacije - 1)
+        xb = tekucapopulacija[n2]
+
+        n3 = random.randint(0, Npopulacije - 1)
+        while n3 == i or n3 == n1 or n3 == n2:
+            n3 = random.randint(0, Npopulacije - 1)
+        xc = tekucapopulacija[n3]
+
+        z = np.zeros(D, dtype=float)
+        z = xa + F * (xb - xc)
+
+        R = random.randint(0, D - 1)
+        r = np.random.uniform(0, 1, D)
+
+        for m in range(D):
+            if r[m] < CR or m == R:
+                y[m] = z[m]
+            else:
+                y[m] = x[m]
+
+        if opfunkcija(y) < opfunkcija(x):
+            tekucapopulacija[i] = y
+
+        if opfunkcija(tekucapopulacija[i]) < fopt:
+            fopt = opfunkcija(tekucapopulacija[i])
+            xopt = tekucapopulacija[i]
+
+
+s = [2.424595205726587e-01, 1.737226395065819e-01, 1.315612759386036e-01,
+     1.022985539042393e-01, 7.905975891960761e-02, 5.717509542148174e-02,
+     3.155886625106896e-02, -6.242228581847679e-03, -6.565183775481365e-02,
+     -8.482380513926287e-02, -1.828677714588237e-02, 3.632382803076845e-02,
+     7.654845872485493e-02, 1.152250132891757e-01, 1.631742367154961e-01,
+     2.358469152696193e-01, 3.650430801728451e-01, 5.816044173713664e-01,
+     5.827732223753571e-01, 3.686942505423780e-01]
+
+F = 0.8
+CR = 0.9
+N = 20
+R0 = 15
+D = 6
+Npopulacije = 10 * D
+
+fopt = 100.0
+xopt = np.zeros(6, dtype=float)
+
+xkord = np.zeros(20, dtype=float)
+ykord = np.zeros(20, dtype=float)
+postavikordinate()
+
+tekucapopulacija = np.random.uniform(-15.0, 15.0, (Npopulacije, D))
+
+for j in range(1300):
+    diferencijalna_evolucija()
+
+print("Rezultat")
+np.set_printoptions(precision=15)
+print(xopt)
+print(fopt)
+============================================================================================================
+10.
+Optimizaciono jato za postavljanje i povezivanje kablova PSO problemi.
+---------------------------
+---------------------------
+import numpy as np
+import random
+import math
+
+
+def optfunckija(x):
+    global A
+    global B
+    global C
+    global D
+
+    S1 = [x[0], x[1], x[2]]
+    S2 = [x[3], x[4], x[5]]
+
+    rezultat = 0
+    rezultat = rezultat + math.sqrt(math.pow(A[0]-S1[0], 2) + math.pow(A[1]-S1[1], 2) + math.pow(A[2]-S1[2], 2))
+    rezultat = rezultat + math.sqrt(math.pow(B[0] - S1[0], 2) + math.pow(B[1] - S1[1], 2) + math.pow(B[2] - S1[2], 2))
+    rezultat = rezultat + math.sqrt(math.pow(S1[0] - S2[0], 2) + math.pow(S1[1] - S2[1], 2) + math.pow(S1[2] - S2[2], 2))
+    rezultat = rezultat + math.sqrt(math.pow(C[0] - S2[0], 2) + math.pow(C[1] - S2[1], 2) + math.pow(C[2] - S2[2], 2))
+    rezultat = rezultat + math.sqrt(math.pow(D[0] - S2[0], 2) + math.pow(D[1] - S2[1], 2) + math.pow(D[2] - S2[2], 2))
+
+    return rezultat
+
+
+Dimenzija = 6
+Npopulacije = 10 * Dimenzija
+
+A = [1, 5, 1]
+B = [3, 2, 0]
+C = [5, 7, 1]
+D = [6, 3, 3]
+
+c1 = 1.494
+c2 = 1.494
+w = 0.729
+
+gbest = -1
+gbestector = np.zeros(Dimenzija, dtype=float)
+
+pbest = np.zeros(Npopulacije, dtype=float)
+pbestvector = np.zeros((Npopulacije, Dimenzija), dtype=float)
+
+Xn = np.random.uniform(-7.0, 7.0, (Npopulacije, Dimenzija))
+Vn = np.random.uniform(-1.5, 1.5, (Npopulacije, Dimenzija))
+
+vmax = 1.5
+vmin = -1.5
+
+
+for i in range(Npopulacije):
+    x = Xn[i]
+    razdaljina = optfunckija(x)
+    pbestvector[i] = x.copy()
+    pbest[i] = razdaljina
+
+    if razdaljina < gbest or gbest == -1:
+        gbest = razdaljina
+        gbestector = x.copy()
+
+
+for i in range(5000):
+    for j in range(Npopulacije):
+        Vn[j] = w * Vn[j] + c1 * random.uniform(0, 1)*(pbestvector[j] - Xn[j]) + c2 * random.uniform(0, 1) * (gbestector - Xn[j])
+
+        for k in range(Dimenzija):
+            if Vn[j][k] > vmax:
+                Vn[j][k] = vmax
+            elif Vn[j][k] < vmin:
+                Vn[j][k] = vmin
+
+        Xn[j] = Xn[j] + Vn[j]
+        razdaljina = optfunckija(Xn[j])
+
+        if razdaljina < pbest[j]:
+            pbest[j] = razdaljina
+            pbestvector[j] = Xn[j].copy()
+            if razdaljina < gbest:
+                gbest = razdaljina
+                gbestector = Xn[j].copy()
+
+print("")
+print("S1(" + str(gbestector[0]) + ", " + str(gbestector[1]) + ", " + str(gbestector[2]) + ")")
+print("S2(" + str(gbestector[3]) + ", " + str(gbestector[4]) + ", " + str(gbestector[5]) + ")")
+print(gbest)
+============================================================================================================
+11.
+Odredjivanje pareto fronta od datog niza gde se koristi ona dva dela za zadatak tako da za dve funkcije.
+---------------------------
+---------------------------
+import numpy as np
+import matplotlib.pyplot as plt
+
+BrTacaka = 10000
+
+Tacka = np.random.uniform(-1.0, 1.0, (BrTacaka, 5))
+
+for i in range(BrTacaka):
+    Tacka[i][2] = 2*(Tacka[i][0]**2) + Tacka[i][1]**2
+    Tacka[i][3] = -((Tacka[i][0] - Tacka[i][1])**2)
+    Tacka[i][4] = 1
+
+for i in range(BrTacaka):
+    for j in range(BrTacaka):
+        if Tacka[j][2] < Tacka[i][2] and Tacka[j][3] < Tacka[i][3]:
+            Tacka[i][4] = 0
+            break
+
+plt.figure("Zadatak 11")
+plt.xlabel("f1")
+plt.ylabel("f2")
+plt.grid()
+
+for i in range(BrTacaka):
+    plt.plot(Tacka[i][2], Tacka[i][3], color="deepskyblue", marker=".")
+
+for i in range(BrTacaka):
+    if Tacka[i][4] == 1:
+        plt.plot(Tacka[i][2], Tacka[i][3], color='orange', marker=".")
+
+plt.show()
+---------------------------
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+
+BrTacaka = 10000
+
+Tacka = np.random.uniform(-1.0, 1.0, (BrTacaka, 5))
+
+
+for i in range(BrTacaka):
+    while Tacka[i][0] * Tacka[i][1] + 0.25 < 0:
+           Tacka[i][0] = random.uniform(-1.0, 1.0)
+           Tacka[i][1] = random.uniform(-1.0, 1.0)
+
+for i in range(BrTacaka):
+    Tacka[i][2] = 2*(Tacka[i][0]**2) + Tacka[i][1]**2
+    Tacka[i][3] = -((Tacka[i][0] - Tacka[i][1])**2)
+    Tacka[i][4] = 1
+
+for i in range(BrTacaka):
+    for j in range(BrTacaka):
+        if Tacka[j][2] < Tacka[i][2] and Tacka[j][3] < Tacka[i][3]:
+            Tacka[i][4] = 0
+            break
+
+plt.figure("Zadatak 11")
+plt.xlabel("f1")
+plt.ylabel("f2")
+plt.grid()
+
+for i in range(BrTacaka):
+    plt.plot(Tacka[i][2], Tacka[i][3], color="deepskyblue", marker=".")
+
+for i in range(BrTacaka):
+    if Tacka[i][4] == 1:
+        plt.plot(Tacka[i][2], Tacka[i][3], color='orange', marker=".")
+
+plt.show()
+============================================================================================================
+12.
+Niz od 1 i 0 de gde se dobija Dalje je taj niz koji se dalje pomera po potrebi
+---------------------------
+---------------------------
+#include<stdio.h>
+#include<time.h>
+#include<iostream>
+#include<bitset>
+
+using namespace std;
+
+int kroskorelacija(int nulti, int prvi) {
+	bitset<32> X0 = nulti;
+	bitset<32> X1 = prvi;
+	int iste = 0;
+	int razlicite = 0;
+
+	for (int i = 30; i >= 0; i--) {
+		if (X0[i] == X1[i]) iste++;
+		else razlicite++;}
+
+	return (iste - razlicite);}
+
+
+
+
+void algoritam(int* raspored,int k) {
+
+	bitset<32>X0global = 1351452275;
+	bitset<32>Xglobal = 0;
+	
+	for (int i = 0; i < k; i++) {
+		Xglobal[raspored[i] - 1] = 1;}
+
+		bitset<32>X0 = X0global;
+		bitset<32>X = Xglobal;
+
+
+		for (int m = 0; m < 31; m++) {
+			int kor = kroskorelacija((int)(Xglobal.to_ullong()), (int)(X0.to_ullong()));
+			int ar = kroskorelacija((int)(Xglobal.to_ullong()), (int)(X.to_ullong()));
+			if (m == 0)ar = 0;
+
+			bool flag = true;
+			if (!(kor > -4 && kor < 6))flag = false;
+			if (!(ar > -18 && ar < 12))flag = false;
+
+			if (flag == false)break;
+			else {
+				if (m == 30) { cout << "Pronadjen broj "; cout << (int)(Xglobal.to_ullong()); cout << " ";
+				for (int i = 30; i >= 0; i--)cout << Xglobal[i] << " ";
+
+				printf("\n"); }
+				int p1 = X0[0];
+				int p2 = X[0];
+
+				X0 = ((int)(X0.to_ullong()) >> 1);
+				X = ((int)(X.to_ullong()) >> 1);
+				X0[30] = p1;
+				X[30] = p2;
+			}
+		}
+
+
+
+}
+
+
+
+int main() {
+	int i, j;
+	int n = 31;
+	int k = 15;
+	bool b;
+	int *P = new int[k];
+	int cnt = 0;
+
+	for (i = 0; i < k; i++)
+		P[i] = i + 1;
+	
+	
+	do {
+		
+		algoritam(P, k);
+
+		b = false;
+		for (i = k - 1; i >= 0; i--) {
+			if (P[i] < n - k + 1 + i) {
+				P[i]++;
+				for (j = i + 1; j < k; j++)
+					P[j] = P[j - 1] + 1;
+				b = true;
+				break;
+			}
+		}
+
+	} while (b);
+
+	if (P != NULL) delete[] P;
+}
